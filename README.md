@@ -36,12 +36,13 @@ Buy and sell items with an intuitive UI and smooth functionality.
    `npm install`
 
 4. **Run the app**  
-   `expo start`
+   `npm start`
 
 Scan the QR code with:
 - **Expo Go app** (for iOS/Android)
 - **Camera app** (iOS only)
 - **Web browser** (press 'w')
+- **Android Studio** (press 'a')
 
 ---
 
