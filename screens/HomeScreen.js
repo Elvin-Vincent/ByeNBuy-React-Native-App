@@ -11,10 +11,14 @@ import {
   TextInput,
   ScrollView,
   Dimensions,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
+
+// Logo import (make sure to add your logo.png to assets)
+const logo = require("../assets/logo.png");
 
 const categories = [
   "All",
@@ -25,6 +29,7 @@ const categories = [
   "Accessories",
 ];
 
+// Product data remains the same as your original
 const featuredItems = [
   {
     id: "f1",
@@ -45,7 +50,6 @@ const featuredItems = [
     isFeatured: true,
   },
 ];
-
 const items = [
   ...featuredItems,
   {
@@ -162,11 +166,11 @@ const items = [
   },
 ];
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [cartItems, setCartItems] = useState(3); // Example cart count
 
-  // Combined filter logic for search and category
   const filteredItems = items.filter((item) => {
     const matchesSearch = item.name
       .toLowerCase()
@@ -178,7 +182,6 @@ export default function HomeScreen() {
 
   const featuredProducts = items.filter((item) => item.isFeatured);
 
-  // Render function for category chips
   const renderCategory = (category) => (
     <TouchableOpacity
       key={category}
@@ -200,7 +203,10 @@ export default function HomeScreen() {
   );
 
   const renderFeaturedItem = ({ item }) => (
-    <View style={styles.featuredCard}>
+    <TouchableOpacity
+      style={styles.featuredCard}
+      onPress={() => navigation.navigate("ProductDetail", { product: item })}
+    >
       <Image source={{ uri: item.image }} style={styles.featuredImage} />
       <View style={styles.featuredOverlay}>
         <Text style={styles.featuredTitle}>{item.name}</Text>
@@ -212,14 +218,20 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderItemCard = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <View style={styles.favoriteIcon}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate("ProductDetail", { product: item })}
+    >
+      <TouchableOpacity
+        style={styles.favoriteIcon}
+        onPress={() => toggleFavorite(item.id)}
+      >
         <Ionicons name="heart-outline" size={20} color="#666" />
-      </View>
+      </TouchableOpacity>
       <Image source={{ uri: item.image }} style={styles.cardImage} />
       <View style={styles.cardDetails}>
         <Text style={styles.cardTitle} numberOfLines={1}>
@@ -240,15 +252,27 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* App Header */}
+      {/* Enhanced Header with Logo */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>ByeNBuy</Text>
+        <View style={styles.logoContainer}>
+          <Image source={logo} style={styles.logo} resizeMode="contain" />
+          <Text style={styles.headerTitle}>ByeNBuy</Text>
+        </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="notifications-outline" size={24} color="#333" />
+            <View style={styles.notificationBadge} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate("Cart")}
+          >
             <Ionicons name="cart-outline" size={24} color="#333" />
+            {cartItems > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.badgeText}>{cartItems}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -270,12 +294,12 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* Main Scrollable Content */}
+      {/* Main Content */}
       <ScrollView
         style={styles.mainContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Categories Horizontal Scroll */}
+        {/* Categories */}
         <View style={styles.categoriesWrapper}>
           <ScrollView
             horizontal
@@ -286,7 +310,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Featured Products Section */}
+        {/* Featured Products */}
         {selectedCategory === "All" && (
           <>
             <Text style={styles.sectionTitle}>Featured Products</Text>
@@ -301,7 +325,7 @@ export default function HomeScreen() {
           </>
         )}
 
-        {/* Products Grid Section */}
+        {/* Products Grid */}
         <Text style={styles.sectionTitle}>
           {selectedCategory === "All" ? "All Products" : selectedCategory}
         </Text>
@@ -329,22 +353,64 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === "ios" ? 50 : 30,
+    paddingBottom: 12,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#ddd",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+    marginRight: 8,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2c3e50",
+    color: "##2c3e50",
+    letterSpacing: 0.5,
   },
   headerIcons: {
     flexDirection: "row",
+    alignItems: "center",
   },
   iconButton: {
-    marginLeft: 15,
+    marginLeft: 16,
+    position: "relative",
+  },
+  notificationBadge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "red",
+  },
+  cartBadge: {
+    position: "absolute",
+    top: -6,
+    right: -10,
+    backgroundColor: "red",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
   },
   searchContainer: {
     flexDirection: "row",

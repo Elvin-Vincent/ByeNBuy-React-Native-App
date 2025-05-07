@@ -3,7 +3,7 @@
     "name": "ByeNBuy",
     "slug": "ByeNBuy",
     "version": "1.0.0",
-    "orientation": "defalt",
+    "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -24,6 +24,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f90c0d86-64c3-47ac-8a98-92b7893d3ba1"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f90c0d86-64c3-47ac-8a98-92b7893d3ba1"
     }
   }
 }
