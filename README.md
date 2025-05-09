@@ -52,7 +52,7 @@ Scan the QR code with:
 You can preview the latest version without cloning:
 
 👉 **Open in Expo Go (Preview Link):**  
-[Click here to preview the app on Expo](https://expo.dev/preview/update?message=Modified%20HomeScreen&updateRuntimeVersion=1.0.0&createdAt=2025-05-07T07%3A31%3A30.070Z&slug=exp&projectId=f90c0d86-64c3-47ac-8a98-92b7893d3ba1&group=da9ce631-410f-4bb2-a776-8c9f932a2bb7)
+[Click here to preview the app on Expo](https://expo.dev/preview/update?message=Updated%20UI%20and%20fixed%20bugs&updateRuntimeVersion=1.0.0&createdAt=2025-05-09T07%3A23%3A49.458Z&slug=exp&projectId=f90c0d86-64c3-47ac-8a98-92b7893d3ba1&group=22086e13-08ac-4f82-a12b-3a36da3d6a39)
 
 > 📱 Scan the QR code on the linked page using the **Expo Go** app to instantly preview the app on your device.
 

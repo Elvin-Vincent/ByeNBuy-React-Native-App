@@ -252,14 +252,22 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    paddingBottom: 120, // Space for fixed buttons
+    paddingBottom: 120,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 26,
+    fontWeight: "700",
     color: "#333",
-    marginBottom: 25,
+    marginTop: 40,
+    marginBottom: 30,
     textAlign: "center",
+    letterSpacing: 1,
+    textShadowColor: "rgba(0,0,0,0.1)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    paddingBottom: 10,
   },
   imagePicker: {
     width: "100%",

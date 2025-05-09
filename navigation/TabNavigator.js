@@ -1,6 +1,12 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableWithoutFeedback, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import HomeScreen from "../screens/HomeScreen";
@@ -9,11 +15,30 @@ import AccountScreen from "../screens/AccountScreen";
 
 const Tab = createBottomTabNavigator();
 
-const CustomSellButton = ({ children, onPress }) => (
-  <TouchableOpacity style={styles.sellButton} onPress={onPress}>
-    <View style={styles.sellButtonInner}>{children}</View>
-  </TouchableOpacity>
-);
+const CustomSellButton = ({ children, onPress }) => {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePress = () => {
+    // Trigger bounce animation
+    scale.value = withSequence(
+      withTiming(1.2, { duration: 100 }),
+      withTiming(1, { duration: 100 })
+    );
+    onPress();
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={handlePress}>
+      <Animated.View style={[styles.sellButton, animatedStyle]}>
+        <View style={styles.sellButtonInner}>{children}</View>
+      </Animated.View>
+    </TouchableWithoutFeedback>
+  );
+};
 
 const TabNavigator = () => {
   return (
