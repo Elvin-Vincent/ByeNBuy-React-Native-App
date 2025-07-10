@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,23 +6,20 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  StatusBar,
   SafeAreaView,
   TextInput,
-  ScrollView,
   Dimensions,
   Platform,
-  PanResponder,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 const isSmallScreen = width < 375;
 const isWeb = Platform.OS === "web";
-
-// Logo import (make sure to add your logo.png to assets)
 const logo = require("../assets/logo.png");
 
+// Categories & Items
 const categories = [
   "All",
   "Electronics",
@@ -32,7 +29,6 @@ const categories = [
   "Accessories",
 ];
 
-// Product data remains the same as your original
 const featuredItems = [
   {
     id: "f1",
@@ -53,6 +49,7 @@ const featuredItems = [
     isFeatured: true,
   },
 ];
+
 const items = [
   ...featuredItems,
   {
@@ -173,22 +170,6 @@ export default function HomeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState(3);
-  const [scrollEnabled, setScrollEnabled] = useState(true);
-  const scrollViewRef = useRef(null);
-
-  // PanResponder to handle scroll vs touch conflicts
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        const { dx, dy } = gestureState;
-        return Math.abs(dy) > Math.abs(dx) * 2;
-      },
-      onPanResponderRelease: () => {
-        setScrollEnabled(true);
-      },
-    })
-  ).current;
 
   const filteredItems = items.filter((item) => {
     const matchesSearch = item.name
@@ -199,300 +180,139 @@ export default function HomeScreen({ navigation }) {
     return matchesSearch && matchesCategory;
   });
 
-  const featuredProducts = items.filter((item) => item.isFeatured);
+  const featuredProducts = filteredItems.filter((item) => item.isFeatured);
 
-  const renderCategory = (category) => (
-    <TouchableOpacity
-      key={category}
-      onPress={() => setSelectedCategory(category)}
-      style={[
-        styles.categoryItem,
-        selectedCategory === category && styles.selectedCategory,
-      ]}
-    >
-      <Text
-        style={[
-          styles.categoryText,
-          selectedCategory === category && styles.selectedCategoryText,
-        ]}
-      >
-        {category}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderFeaturedItem = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.featuredCard, isSmallScreen && styles.featuredCardSmall]}
-      onPress={() => navigation.navigate("ProductDetail", { product: item })}
-      activeOpacity={0.7}
-    >
-      <Image
-        source={{ uri: item.image }}
-        style={[
-          styles.featuredImage,
-          isSmallScreen && styles.featuredImageSmall,
-        ]}
-        resizeMode="cover"
-      />
-      <View style={styles.featuredOverlay}>
-        <Text
-          style={[
-            styles.featuredTitle,
-            isSmallScreen && styles.featuredTitleSmall,
-          ]}
-        >
-          {item.name}
-        </Text>
-        <View style={styles.priceRatingContainer}>
-          <Text
-            style={[
-              styles.featuredPrice,
-              isSmallScreen && styles.featuredPriceSmall,
-            ]}
-          >
-            {item.price}
-          </Text>
-          <View style={styles.ratingContainer}>
-            <Ionicons
-              name="star"
-              size={isSmallScreen ? 14 : 16}
-              color="#FFD700"
-            />
-            <Text
-              style={[
-                styles.ratingText,
-                isSmallScreen && styles.ratingTextSmall,
-              ]}
-            >
-              {item.rating}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderItemCard = ({ item }) => (
-    <View style={[styles.card, isSmallScreen && styles.cardSmall]}>
-      <TouchableOpacity
-        style={styles.favoriteIcon}
-        onPress={() => toggleFavorite(item.id)}
-      >
-        <Ionicons
-          name="heart-outline"
-          size={isSmallScreen ? 16 : 20}
-          color="#666"
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => navigation.navigate("ProductDetail", { product: item })}
-      >
-        <Image
-          source={{ uri: item.image }}
-          style={[styles.cardImage, isSmallScreen && styles.cardImageSmall]}
-          resizeMode="cover"
-        />
-        <View style={styles.cardDetails}>
-          <Text
-            style={[styles.cardTitle, isSmallScreen && styles.cardTitleSmall]}
-            numberOfLines={1}
-          >
-            {item.name}
-          </Text>
-          <View style={styles.priceRatingContainer}>
-            <Text
-              style={[styles.cardPrice, isSmallScreen && styles.cardPriceSmall]}
-            >
-              {item.price}
-            </Text>
-            <View style={styles.ratingContainer}>
-              <Ionicons
-                name="star"
-                size={isSmallScreen ? 12 : 14}
-                color="#FFD700"
-              />
-              <Text
-                style={[
-                  styles.ratingText,
-                  isSmallScreen && styles.ratingTextSmall,
-                ]}
-              >
-                {item.rating}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-
-  // Web-friendly scroll container
-  const ScrollContainer = isWeb
-    ? ({ children, style }) => (
-        <div
-          style={{ ...styles.webScrollContainer, ...style }}
-          {...panResponder.panHandlers}
-        >
-          {children}
-        </div>
-      )
-    : ({ children, style }) => (
-        <ScrollView
-          ref={scrollViewRef}
-          style={style}
-          contentContainerStyle={styles.mainContentContainer}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={scrollEnabled}
-          onScrollBeginDrag={() => setScrollEnabled(true)}
-          {...panResponder.panHandlers}
-        >
-          {children}
-        </ScrollView>
-      );
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
-      {/* Header */}
-      <View style={[styles.header, isSmallScreen && styles.headerSmall]}>
+  const renderHeader = () => (
+    <>
+      {/* Logo & Icons */}
+      <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <Image
-            source={logo}
-            style={[styles.logo, isSmallScreen && styles.logoSmall]}
-            resizeMode="contain"
-          />
-          <Text
-            style={[
-              styles.headerTitle,
-              isSmallScreen && styles.headerTitleSmall,
-            ]}
-          >
-            ByeNBuy
-          </Text>
+          <Image source={logo} style={styles.logo} />
+          <Text style={styles.headerTitle}>ByeNBuy</Text>
         </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity style={styles.iconButton}>
-            <Ionicons
-              name="notifications-outline"
-              size={isSmallScreen ? 20 : 24}
-              color="#333"
-            />
+            <Ionicons name="notifications-outline" size={24} color="#333" />
             <View style={styles.notificationBadge} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => navigation.navigate("Cart")}
           >
-            <Ionicons
-              name="cart-outline"
-              size={isSmallScreen ? 20 : 24}
-              color="#333"
-            />
+            <Ionicons name="cart-outline" size={24} color="#333" />
             {cartItems > 0 && (
-              <View
-                style={[
-                  styles.cartBadge,
-                  isSmallScreen && styles.cartBadgeSmall,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.badgeText,
-                    isSmallScreen && styles.badgeTextSmall,
-                  ]}
-                >
-                  {cartItems}
-                </Text>
+              <View style={styles.cartBadge}>
+                <Text style={styles.badgeText}>{cartItems}</Text>
               </View>
             )}
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Search Bar */}
-      <View
-        style={[
-          styles.searchContainer,
-          isSmallScreen && styles.searchContainerSmall,
-        ]}
-      >
-        <Ionicons
-          name="search"
-          size={isSmallScreen ? 16 : 20}
-          color="#666"
-          style={styles.searchIcon}
-        />
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#666" />
         <TextInput
-          style={[styles.searchInput, isSmallScreen && styles.searchInputSmall]}
-          placeholder="Search for products..."
-          placeholderTextColor="#999"
+          style={styles.searchInput}
+          placeholder="Search products..."
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
 
-      {/* Main Content */}
-      <ScrollContainer style={styles.mainContent}>
-        {/* Categories */}
-        <View style={styles.categoriesWrapper}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filtersContainer}
+      {/* Categories */}
+      <FlatList
+        horizontal
+        data={categories}
+        keyExtractor={(item) => item}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filtersContainer}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[
+              styles.categoryItem,
+              selectedCategory === item && styles.selectedCategory,
+            ]}
+            onPress={() => setSelectedCategory(item)}
           >
-            {categories.map(renderCategory)}
-          </ScrollView>
-        </View>
-
-        {/* Featured Products */}
-        {selectedCategory === "All" && (
-          <>
             <Text
               style={[
-                styles.sectionTitle,
-                isSmallScreen && styles.sectionTitleSmall,
+                styles.categoryText,
+                selectedCategory === item && styles.selectedCategoryText,
               ]}
             >
-              Featured Products
+              {item}
             </Text>
-            <FlatList
-              horizontal
-              data={featuredProducts}
-              keyExtractor={(item) => item.id}
-              renderItem={renderFeaturedItem}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.featuredListContainer}
-            />
-          </>
+          </TouchableOpacity>
         )}
+      />
 
-        {/* Products Grid */}
-        <Text
-          style={[
-            styles.sectionTitle,
-            isSmallScreen && styles.sectionTitleSmall,
-          ]}
-        >
-          {selectedCategory === "All" ? "All Products" : selectedCategory}
-        </Text>
-        <FlatList
-          data={filteredItems}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItemCard}
-          contentContainerStyle={styles.cardListContainer}
-          showsVerticalScrollIndicator={false}
-          numColumns={isSmallScreen ? 2 : 2}
-          columnWrapperStyle={
-            isSmallScreen ? styles.columnWrapperSmall : styles.columnWrapper
-          }
-          scrollEnabled={false}
-          onTouchStart={() => setScrollEnabled(false)}
-          onTouchEnd={() => setScrollEnabled(true)}
-        />
-      </ScrollContainer>
+      {/* Featured */}
+      {selectedCategory === "All" && featuredProducts.length > 0 && (
+        <>
+          <Text style={styles.sectionTitle}>Featured Products</Text>
+          <FlatList
+            horizontal
+            data={featuredProducts}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.featuredListContainer}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.featuredCard}
+                onPress={() =>
+                  navigation.navigate("ProductDetail", { product: item })
+                }
+              >
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.featuredImage}
+                />
+                <View style={styles.featuredOverlay}>
+                  <Text style={styles.featuredTitle}>{item.name}</Text>
+                  <Text style={styles.featuredPrice}>{item.price}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      )}
+
+      <Text style={styles.sectionTitle}>
+        {selectedCategory === "All" ? "All Products" : selectedCategory}
+      </Text>
+    </>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <FlatList
+        data={filteredItems}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={renderHeader}
+        showsVerticalScrollIndicator={false}
+        numColumns={2}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+          paddingHorizontal: 10,
+        }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() =>
+              navigation.navigate("ProductDetail", { product: item })
+            }
+          >
+            <Image source={{ uri: item.image }} style={styles.cardImage} />
+            <Text style={styles.cardTitle} numberOfLines={1}>
+              {item.name}
+            </Text>
+            <Text style={styles.cardPrice}>{item.price}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 }
