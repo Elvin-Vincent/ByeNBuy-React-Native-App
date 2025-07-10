@@ -293,17 +293,16 @@ export default function HomeScreen({ navigation }) {
         ListHeaderComponent={renderHeader}
         showsVerticalScrollIndicator={false}
         numColumns={2}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-          paddingHorizontal: 10,
-        }}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        columnWrapperStyle={
+          isSmallScreen ? styles.columnWrapperSmall : styles.columnWrapper
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
             onPress={() =>
               navigation.navigate("ProductDetail", { product: item })
             }
+            activeOpacity={0.8}
           >
             <Image source={{ uri: item.image }} style={styles.cardImage} />
             <Text style={styles.cardTitle} numberOfLines={1}>
@@ -567,7 +566,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     position: "relative",
+    marginHorizontal: 5, // 👈 This helps cards breathe
   },
+
   cardSmall: {
     width: width * 0.44,
     padding: 8,
