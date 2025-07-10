@@ -15,7 +15,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
+const isSmallScreen = width < 375; // Adjust this threshold as needed
 
 // Logo import (make sure to add your logo.png to assets)
 const logo = require("../assets/logo.png");
@@ -204,17 +205,49 @@ export default function HomeScreen({ navigation }) {
 
   const renderFeaturedItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.featuredCard}
+      style={[styles.featuredCard, isSmallScreen && styles.featuredCardSmall]}
       onPress={() => navigation.navigate("ProductDetail", { product: item })}
     >
-      <Image source={{ uri: item.image }} style={styles.featuredImage} />
+      <Image
+        source={{ uri: item.image }}
+        style={[
+          styles.featuredImage,
+          isSmallScreen && styles.featuredImageSmall,
+        ]}
+        resizeMode="cover"
+      />
       <View style={styles.featuredOverlay}>
-        <Text style={styles.featuredTitle}>{item.name}</Text>
+        <Text
+          style={[
+            styles.featuredTitle,
+            isSmallScreen && styles.featuredTitleSmall,
+          ]}
+        >
+          {item.name}
+        </Text>
         <View style={styles.priceRatingContainer}>
-          <Text style={styles.featuredPrice}>{item.price}</Text>
+          <Text
+            style={[
+              styles.featuredPrice,
+              isSmallScreen && styles.featuredPriceSmall,
+            ]}
+          >
+            {item.price}
+          </Text>
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={16} color="#FFD700" />
-            <Text style={styles.ratingText}>{item.rating}</Text>
+            <Ionicons
+              name="star"
+              size={isSmallScreen ? 14 : 16}
+              color="#FFD700"
+            />
+            <Text
+              style={[
+                styles.ratingText,
+                isSmallScreen && styles.ratingTextSmall,
+              ]}
+            >
+              {item.rating}
+            </Text>
           </View>
         </View>
       </View>
@@ -223,25 +256,51 @@ export default function HomeScreen({ navigation }) {
 
   const renderItemCard = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, isSmallScreen && styles.cardSmall]}
       onPress={() => navigation.navigate("ProductDetail", { product: item })}
     >
       <TouchableOpacity
         style={styles.favoriteIcon}
         onPress={() => toggleFavorite(item.id)}
       >
-        <Ionicons name="heart-outline" size={20} color="#666" />
+        <Ionicons
+          name="heart-outline"
+          size={isSmallScreen ? 16 : 20}
+          color="#666"
+        />
       </TouchableOpacity>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
+      <Image
+        source={{ uri: item.image }}
+        style={[styles.cardImage, isSmallScreen && styles.cardImageSmall]}
+        resizeMode="cover"
+      />
       <View style={styles.cardDetails}>
-        <Text style={styles.cardTitle} numberOfLines={1}>
+        <Text
+          style={[styles.cardTitle, isSmallScreen && styles.cardTitleSmall]}
+          numberOfLines={1}
+        >
           {item.name}
         </Text>
         <View style={styles.priceRatingContainer}>
-          <Text style={styles.cardPrice}>{item.price}</Text>
+          <Text
+            style={[styles.cardPrice, isSmallScreen && styles.cardPriceSmall]}
+          >
+            {item.price}
+          </Text>
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#FFD700" />
-            <Text style={styles.ratingText}>{item.rating}</Text>
+            <Ionicons
+              name="star"
+              size={isSmallScreen ? 12 : 14}
+              color="#FFD700"
+            />
+            <Text
+              style={[
+                styles.ratingText,
+                isSmallScreen && styles.ratingTextSmall,
+              ]}
+            >
+              {item.rating}
+            </Text>
           </View>
         </View>
       </View>
@@ -253,24 +312,55 @@ export default function HomeScreen({ navigation }) {
       <StatusBar barStyle="dark-content" />
 
       {/* Enhanced Header with Logo */}
-      <View style={styles.header}>
+      <View style={[styles.header, isSmallScreen && styles.headerSmall]}>
         <View style={styles.logoContainer}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.headerTitle}>ByeNBuy</Text>
+          <Image
+            source={logo}
+            style={[styles.logo, isSmallScreen && styles.logoSmall]}
+            resizeMode="contain"
+          />
+          <Text
+            style={[
+              styles.headerTitle,
+              isSmallScreen && styles.headerTitleSmall,
+            ]}
+          >
+            ByeNBuy
+          </Text>
         </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="notifications-outline" size={24} color="#333" />
+            <Ionicons
+              name="notifications-outline"
+              size={isSmallScreen ? 20 : 24}
+              color="#333"
+            />
             <View style={styles.notificationBadge} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => navigation.navigate("Cart")}
           >
-            <Ionicons name="cart-outline" size={24} color="#333" />
+            <Ionicons
+              name="cart-outline"
+              size={isSmallScreen ? 20 : 24}
+              color="#333"
+            />
             {cartItems > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.badgeText}>{cartItems}</Text>
+              <View
+                style={[
+                  styles.cartBadge,
+                  isSmallScreen && styles.cartBadgeSmall,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.badgeText,
+                    isSmallScreen && styles.badgeTextSmall,
+                  ]}
+                >
+                  {cartItems}
+                </Text>
               </View>
             )}
           </TouchableOpacity>
@@ -278,15 +368,20 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      <View
+        style={[
+          styles.searchContainer,
+          isSmallScreen && styles.searchContainerSmall,
+        ]}
+      >
         <Ionicons
           name="search"
-          size={20}
+          size={isSmallScreen ? 16 : 20}
           color="#666"
           style={styles.searchIcon}
         />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, isSmallScreen && styles.searchInputSmall]}
           placeholder="Search for products..."
           placeholderTextColor="#999"
           value={searchQuery}
@@ -313,7 +408,14 @@ export default function HomeScreen({ navigation }) {
         {/* Featured Products */}
         {selectedCategory === "All" && (
           <>
-            <Text style={styles.sectionTitle}>Featured Products</Text>
+            <Text
+              style={[
+                styles.sectionTitle,
+                isSmallScreen && styles.sectionTitleSmall,
+              ]}
+            >
+              Featured Products
+            </Text>
             <FlatList
               horizontal
               data={featuredProducts}
@@ -326,7 +428,12 @@ export default function HomeScreen({ navigation }) {
         )}
 
         {/* Products Grid */}
-        <Text style={styles.sectionTitle}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            isSmallScreen && styles.sectionTitleSmall,
+          ]}
+        >
           {selectedCategory === "All" ? "All Products" : selectedCategory}
         </Text>
         <FlatList
@@ -335,8 +442,10 @@ export default function HomeScreen({ navigation }) {
           renderItem={renderItemCard}
           contentContainerStyle={styles.cardListContainer}
           showsVerticalScrollIndicator={false}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
+          numColumns={isSmallScreen ? 2 : 2} // You could change to 1 for very small screens
+          columnWrapperStyle={
+            isSmallScreen ? styles.columnWrapperSmall : styles.columnWrapper
+          }
           scrollEnabled={false}
         />
       </ScrollView>
@@ -365,6 +474,10 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  headerSmall: {
+    paddingTop: Platform.OS === "ios" ? 30 : 20,
+    paddingBottom: 8,
+  },
   logoContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -375,11 +488,19 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginRight: 8,
   },
+  logoSmall: {
+    width: 32,
+    height: 32,
+    marginRight: 6,
+  },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "##2c3e50",
+    color: "#2c3e50",
     letterSpacing: 0.5,
+  },
+  headerTitleSmall: {
+    fontSize: 20,
   },
   headerIcons: {
     flexDirection: "row",
@@ -407,10 +528,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 1,
   },
+  cartBadgeSmall: {
+    top: -4,
+    right: -8,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+  },
   badgeText: {
     color: "#fff",
     fontSize: 10,
     fontWeight: "bold",
+  },
+  badgeTextSmall: {
+    fontSize: 8,
   },
   searchContainer: {
     flexDirection: "row",
@@ -426,6 +556,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
+  searchContainerSmall: {
+    marginHorizontal: 15,
+    marginVertical: 10,
+    paddingHorizontal: 12,
+  },
   searchIcon: {
     marginRight: 10,
   },
@@ -434,6 +569,10 @@ const styles = StyleSheet.create({
     height: 45,
     fontSize: 16,
     color: "#333",
+  },
+  searchInputSmall: {
+    height: 40,
+    fontSize: 14,
   },
   mainContent: {
     flex: 1,
@@ -477,6 +616,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#2c3e50",
   },
+  sectionTitleSmall: {
+    fontSize: 16,
+    marginHorizontal: 15,
+    marginTop: 15,
+    marginBottom: 8,
+  },
   featuredListContainer: {
     paddingHorizontal: 15,
     paddingBottom: 15,
@@ -489,10 +634,16 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
   },
+  featuredCardSmall: {
+    width: width * 0.7,
+    height: 150,
+  },
   featuredImage: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover",
+  },
+  featuredImageSmall: {
+    height: "100%",
   },
   featuredOverlay: {
     position: "absolute",
@@ -510,10 +661,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 5,
   },
+  featuredTitleSmall: {
+    fontSize: 14,
+    marginBottom: 3,
+  },
   featuredPrice: {
     fontSize: 15,
     color: "#FFD700",
     fontWeight: "bold",
+  },
+  featuredPriceSmall: {
+    fontSize: 13,
   },
   cardListContainer: {
     paddingHorizontal: 15,
@@ -522,6 +680,10 @@ const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: "space-between",
     marginBottom: 15,
+  },
+  columnWrapperSmall: {
+    justifyContent: "space-between",
+    marginBottom: 10,
   },
   card: {
     width: width * 0.45,
@@ -534,6 +696,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     position: "relative",
+  },
+  cardSmall: {
+    width: width * 0.44,
+    padding: 8,
+    borderRadius: 10,
   },
   favoriteIcon: {
     position: "absolute",
@@ -549,7 +716,10 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 8,
     marginBottom: 10,
-    resizeMode: "cover",
+  },
+  cardImageSmall: {
+    height: 100,
+    marginBottom: 8,
   },
   cardDetails: {
     paddingHorizontal: 5,
@@ -560,10 +730,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: "#333",
   },
+  cardTitleSmall: {
+    fontSize: 12,
+    marginBottom: 3,
+  },
   cardPrice: {
     fontSize: 14,
     color: "#2c3e50",
     fontWeight: "bold",
+  },
+  cardPriceSmall: {
+    fontSize: 12,
   },
   priceRatingContainer: {
     flexDirection: "row",
@@ -578,5 +755,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     marginLeft: 3,
+  },
+  ratingTextSmall: {
+    fontSize: 10,
+    marginLeft: 2,
   },
 });
