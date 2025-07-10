@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   ScrollView,
   Dimensions,
   Platform,
+  PanResponder,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -171,7 +172,23 @@ const items = [
 export default function HomeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartItems, setCartItems] = useState(3); // Example cart count
+  const [cartItems, setCartItems] = useState(3);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+  const scrollViewRef = useRef(null);
+
+  // PanResponder to handle scroll vs touch conflicts
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        const { dx, dy } = gestureState;
+        return Math.abs(dy) > Math.abs(dx) * 2;
+      },
+      onPanResponderRelease: () => {
+        setScrollEnabled(true);
+      },
+    })
+  ).current;
 
   const filteredItems = items.filter((item) => {
     const matchesSearch = item.name
@@ -208,6 +225,7 @@ export default function HomeScreen({ navigation }) {
     <TouchableOpacity
       style={[styles.featuredCard, isSmallScreen && styles.featuredCardSmall]}
       onPress={() => navigation.navigate("ProductDetail", { product: item })}
+      activeOpacity={0.7}
     >
       <Image
         source={{ uri: item.image }}
@@ -256,10 +274,7 @@ export default function HomeScreen({ navigation }) {
   );
 
   const renderItemCard = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.card, isSmallScreen && styles.cardSmall]}
-      onPress={() => navigation.navigate("ProductDetail", { product: item })}
-    >
+    <View style={[styles.card, isSmallScreen && styles.cardSmall]}>
       <TouchableOpacity
         style={styles.favoriteIcon}
         onPress={() => toggleFavorite(item.id)}
@@ -270,54 +285,68 @@ export default function HomeScreen({ navigation }) {
           color="#666"
         />
       </TouchableOpacity>
-      <Image
-        source={{ uri: item.image }}
-        style={[styles.cardImage, isSmallScreen && styles.cardImageSmall]}
-        resizeMode="cover"
-      />
-      <View style={styles.cardDetails}>
-        <Text
-          style={[styles.cardTitle, isSmallScreen && styles.cardTitleSmall]}
-          numberOfLines={1}
-        >
-          {item.name}
-        </Text>
-        <View style={styles.priceRatingContainer}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => navigation.navigate("ProductDetail", { product: item })}
+      >
+        <Image
+          source={{ uri: item.image }}
+          style={[styles.cardImage, isSmallScreen && styles.cardImageSmall]}
+          resizeMode="cover"
+        />
+        <View style={styles.cardDetails}>
           <Text
-            style={[styles.cardPrice, isSmallScreen && styles.cardPriceSmall]}
+            style={[styles.cardTitle, isSmallScreen && styles.cardTitleSmall]}
+            numberOfLines={1}
           >
-            {item.price}
+            {item.name}
           </Text>
-          <View style={styles.ratingContainer}>
-            <Ionicons
-              name="star"
-              size={isSmallScreen ? 12 : 14}
-              color="#FFD700"
-            />
+          <View style={styles.priceRatingContainer}>
             <Text
-              style={[
-                styles.ratingText,
-                isSmallScreen && styles.ratingTextSmall,
-              ]}
+              style={[styles.cardPrice, isSmallScreen && styles.cardPriceSmall]}
             >
-              {item.rating}
+              {item.price}
             </Text>
+            <View style={styles.ratingContainer}>
+              <Ionicons
+                name="star"
+                size={isSmallScreen ? 12 : 14}
+                color="#FFD700"
+              />
+              <Text
+                style={[
+                  styles.ratingText,
+                  isSmallScreen && styles.ratingTextSmall,
+                ]}
+              >
+                {item.rating}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 
   // Web-friendly scroll container
   const ScrollContainer = isWeb
     ? ({ children, style }) => (
-        <div style={{ ...styles.webScrollContainer, ...style }}>{children}</div>
+        <div
+          style={{ ...styles.webScrollContainer, ...style }}
+          {...panResponder.panHandlers}
+        >
+          {children}
+        </div>
       )
     : ({ children, style }) => (
         <ScrollView
+          ref={scrollViewRef}
           style={style}
           contentContainerStyle={styles.mainContentContainer}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={scrollEnabled}
+          onScrollBeginDrag={() => setScrollEnabled(true)}
+          {...panResponder.panHandlers}
         >
           {children}
         </ScrollView>
@@ -327,7 +356,7 @@ export default function HomeScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Enhanced Header with Logo */}
+      {/* Header */}
       <View style={[styles.header, isSmallScreen && styles.headerSmall]}>
         <View style={styles.logoContainer}>
           <Image
@@ -459,7 +488,9 @@ export default function HomeScreen({ navigation }) {
           columnWrapperStyle={
             isSmallScreen ? styles.columnWrapperSmall : styles.columnWrapper
           }
-          scrollEnabled={!isWeb}
+          scrollEnabled={false}
+          onTouchStart={() => setScrollEnabled(false)}
+          onTouchEnd={() => setScrollEnabled(true)}
         />
       </ScrollContainer>
     </SafeAreaView>
