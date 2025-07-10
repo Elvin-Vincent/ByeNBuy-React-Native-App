@@ -16,7 +16,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
-const isSmallScreen = width < 375; // Adjust this threshold as needed
+const isSmallScreen = width < 375;
+const isWeb = Platform.OS === "web";
 
 // Logo import (make sure to add your logo.png to assets)
 const logo = require("../assets/logo.png");
@@ -307,6 +308,21 @@ export default function HomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
+  // Web-friendly scroll container
+  const ScrollContainer = isWeb
+    ? ({ children, style }) => (
+        <div style={{ ...styles.webScrollContainer, ...style }}>{children}</div>
+      )
+    : ({ children, style }) => (
+        <ScrollView
+          style={style}
+          contentContainerStyle={styles.mainContentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+      );
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -390,10 +406,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Main Content */}
-      <ScrollView
-        style={styles.mainContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollContainer style={styles.mainContent}>
         {/* Categories */}
         <View style={styles.categoriesWrapper}>
           <ScrollView
@@ -442,13 +455,13 @@ export default function HomeScreen({ navigation }) {
           renderItem={renderItemCard}
           contentContainerStyle={styles.cardListContainer}
           showsVerticalScrollIndicator={false}
-          numColumns={isSmallScreen ? 2 : 2} // You could change to 1 for very small screens
+          numColumns={isSmallScreen ? 2 : 2}
           columnWrapperStyle={
             isSmallScreen ? styles.columnWrapperSmall : styles.columnWrapper
           }
-          scrollEnabled={false}
+          scrollEnabled={!isWeb}
         />
-      </ScrollView>
+      </ScrollContainer>
     </SafeAreaView>
   );
 }
@@ -457,6 +470,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
+  },
+  webScrollContainer: {
+    height: "100vh",
+    overflowY: "auto",
+    WebkitOverflowScrolling: "touch",
+  },
+  mainContent: {
+    flex: 1,
+  },
+  mainContentContainer: {
+    paddingBottom: 20,
   },
   header: {
     flexDirection: "row",
@@ -573,10 +597,6 @@ const styles = StyleSheet.create({
   searchInputSmall: {
     height: 40,
     fontSize: 14,
-  },
-  mainContent: {
-    flex: 1,
-    paddingBottom: 20,
   },
   categoriesWrapper: {
     paddingVertical: 10,
